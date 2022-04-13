@@ -1,0 +1,36 @@
+
+data ExpA = Valor Int | Sum ExpA ExpA | Prod ExpA ExpA | Neg ExpA
+
+eval :: ExpA -> -> Int
+eval (Valor n)     = n
+eval (Sum   e1 e2) = eval e1 + eval e2
+eval (Prod  e1 e2) = eval e1 * eval e2 
+eval (Neg   e1)    = eval e1 * (-1)
+
+-- 2) Dada una expresión aritmética, la simplifica según los siguientes criterios (descritos utilizando
+--    notación matemática convencional):
+--    a) 0 + x = x + 0 = x
+--    b) 0 * x = x * 0 = 0
+--    c) 1 * x = x * 1 = x
+--    d) - (- x) = x
+simplificar :: ExpA -> ExpA
+simplificar (Valor n)     = Valor n
+simplificar (Sum   e1 e2) = SimplificarSuma (simplificar e1) (simplificar e2) 
+simplificar (Prod  e1 e2) = SimplificarProd (simplificar e1) (simplificar e2) 
+simplificar (Neg   e1)    = SimplificarNeg (simplificar e1) 
+
+
+simplificarSuma :: ExpA -> ExpA -> ExpA
+simplificarSuma (Valor 0) v2         = v2 
+simplificarSuma v1        (Valor 0)  = v1
+
+simplificarProd :: ExpA -> ExpA -> ExpA
+simplificarProd (Valor 0) v2        = 0
+simplificarProd v1        (Valor 0) = 0
+simplificarProd (Valor 1) v2        = v2
+simplificarProd v1        (Valor 1) = v1
+
+simplificarNeg :: ExpA -> ExpA
+simplificarNeg (Neg e) = - e
+
+   
