@@ -327,6 +327,17 @@ agregarASectorS cs1 (S i cs2 tr) = (S i (cs1 ++ cs2) tr)
 esSectorConId :: Sector -> SectorId -> Bool
 esSectorConId (S i _ _) sid = i == sid
 
+-- Incorpora un tripulante a una lista de sectores de la nave.
+-- Precondición: Todos los id de la lista existen en la nave.
+asignarTripulanteA :: Tripulante -> [SectorId] -> Nave -> Nave
+asignarTripulanteA t ss (N tr) = N (asignarTripulanteAT t ss tr)
+
+asignarTripulanteAT :: Tripulante -> [SectorId] -> Tree Sector -> Tree Sector
+asignarTripulanteAT _ _   EmptyT          = 
+asignarTripulanteAT t ids (NodeT s si sd) = 
+    NodeT (asignarTripulanteAS t ids s) (asignarTripulanteAT t ids si) (asignarTripulanteAT t ids sd) 
+
+
 
 
 
