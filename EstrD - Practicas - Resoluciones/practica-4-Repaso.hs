@@ -330,12 +330,84 @@ esSectorConId (S i _ _) sid = i == sid
 -- Incorpora un tripulante a una lista de sectores de la nave.
 -- Precondición: Todos los id de la lista existen en la nave.
 asignarTripulanteA :: Tripulante -> [SectorId] -> Nave -> Nave
-asignarTripulanteA t ss (N tr) = N (asignarTripulanteAT t ss tr)
+asignarTripulanteA t ids (N tr) = N (asignarTripulanteAT t ids tr)
 
 asignarTripulanteAT :: Tripulante -> [SectorId] -> Tree Sector -> Tree Sector
-asignarTripulanteAT _ _   EmptyT          = 
+asignarTripulanteAT _ _   EmptyT          = EmptyT
 asignarTripulanteAT t ids (NodeT s si sd) = 
     NodeT (asignarTripulanteAS t ids s) (asignarTripulanteAT t ids si) (asignarTripulanteAT t ids sd) 
+    
+    
+asignarTripulanteAS :: Tripulante -> [SectorId] -> Sector -> Sector    
+asignarTripulanteAS t []       s = s
+asignarTripulanteAS t (id:ids) s =
+    if esSectorConId s id
+        then asignarTripulante t s
+	else asignarTripulanteAS t ids s
+
+-- Propósito: Devuelve los sectores en donde aparece un tripulante dado.
+sectoresAsignados :: Tripulante -> Nave -> [SectorId]
+sectoresAsignados tr (N t) = sectoresAsignadosT tr t
+
+sectoresAsignadosT :: Tripulante -> Tree Sector -> [SectorId]
+sectoresAsignadosT t EmptyT          = []
+sectoresAsignadosT t (NodeT s si sd) = singularSi s (esAsignadoA t s) : sectoresAsignadosT t si ++ sectoresAsignadosT t sd
+
+-- dado un tripulante y un sector, indica si el tripulante pertenece al sector.
+esAsignadoA :: Tripulante -> Sector -> Bool
+esAsignadoA t (S i cs ts) = estaElTripulante t ts
+
+-- dado un tripulante y una lista de tripulante, indica si el tripulante pertenece la lista.
+estaElTripulante :: Tripulante -> [Tripulante] -> Bool
+estaElTripulante _  []     = False
+estaElTripulante t1 (t:ts) = t1 == t || estaElTripulante t1 ts
+
+
+-- 4. MANADA DE LOBOS
+
+type Presa = String -- nombre de presa
+
+type Territorio = String -- nombre de territorio
+
+type Nombre = String -- nombre de lobo
+
+data Lobo = Cazador Nombre [Presa] Lobo Lobo Lobo | Explorador Nombre [Territorio] Lobo Lobo | Cria Nombre
+
+data Manada = M Lobo
+
+-- 1) Construir un valor de tipo Manada que posea 1 cazador, 2 exploradores y que el resto sean
+--    crías. Resolver las siguientes funciones utilizando recursión estructural sobre la estructura
+--    que corresponda en cada caso.
+
+m1 = Cazador "pichicho" [] 
+         (Explorador "firu" [] 
+	     (Cria "sfaf") 
+	     (Cria "asfas"))
+	 (Explorador "pancho" 
+	     (Cria "ksa")
+	     (Cria "kasn"))
+	 (Cria "qpq") 
+
+--  dada una manada, indica si la cantidad de alimento cazado es mayor a la cantidad de crías.
+buenaCaza :: Manada -> Bool 
+buenaCaza (M l) = buenaCazaL l
+
+buenaCazaL :: Lobo -> Bool
+buenaCazaL (Cria       n)             = 
+buenaCazaL (Explorador n ts l1 l2)    =  
+buenaCazaL (Cazador    n ps l1 l2 l3) = 
+
+	 
+
+
+
+        
+
+
+
+
+
+
 
 
 
