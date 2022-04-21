@@ -362,6 +362,10 @@ estaElTripulante :: Tripulante -> [Tripulante] -> Bool
 estaElTripulante _  []     = False
 estaElTripulante t1 (t:ts) = t1 == t || estaElTripulante t1 ts
 
+singularSi :: a -> Bool -> [a]
+singularSi x True  = [x]
+singularSi x False = [] 
+
 
 -- 4. MANADA DE LOBOS
 
@@ -390,14 +394,49 @@ m1 = Cazador "pichicho" []
 
 --  dada una manada, indica si la cantidad de alimento cazado es mayor a la cantidad de crías.
 buenaCaza :: Manada -> Bool 
-buenaCaza (M l) = buenaCazaL l
+buenaCaza (M l) = cantDePresas l > cantDeCrias l
 
-buenaCazaL :: Lobo -> Bool
-buenaCazaL (Cria       n)             = 
-buenaCazaL (Explorador n ts l1 l2)    =  
-buenaCazaL (Cazador    n ps l1 l2 l3) = 
+-- dado un lobo, describe la cantidad de presas que cazaron. 
+cantDePresas :: Lobo -> Int
+cantDePresas (Cria       n)             = 0
+cantDePresas (Explorador n ts l1 l2)    = cantDePresas l1 + cantDePresas l2 
+cantDePresas (Cazador    n ps l1 l2 l3) = 
+    presas ps + cantDePresas l1 + cantDePresas l2 + cantDePresas l3
 
-	 
+-- dada una lista de presas, devuelve su cantidad.
+presas :: [Presa] -> Int
+presas ps = length ps
+
+cantDeCrias :: Lobo -> Int
+cantDeCrias (Cria       n)             = 1
+cantDeCrias (Explorador n ts l1 l2)    = cantDeCrias l1 + cantDeCrias l2
+cantDeCrias (Cazador    n ps l1 l2 l3) = cantDeCrias l1 + cantDeCrias l2 + cantDeCrias l3
+
+-- 3) dada una manada, devuelve el nombre del lobo con más presas cazadas, junto con su cantidad de
+--    presas. Nota: se considera que los exploradores y crías tienen cero presas cazadas, y que 
+--    podrían formar parte del resultado si es que no existen cazadores con más de cero presas
+elAlfa :: Manada -> (Nombre, Int)
+elAlfa (M l) = elAlfaL l
+
+elAlfaL :: Lobo -> (Nombre, Int)
+elAlfaL (Cria n)                   = (n,0)
+elAlfaL (Explorador n ts l1 l2)    = (n,0) (elAlfaL l1) (elAlfaL l2)
+elAlfaL (Cazador    n ps l1 l2 l3) = mayorCazador (n,presas ps) (elAlfaL l1) (elAlfaL l2) (elAlfaL l3)
+
+-- dadas cuatro tuplas con nombre de lobo y el número de presas asignadas, devuelve la de mayor cantidad
+-- de presas cazadas.
+mayorCazador :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
+mayorCazador t1 t2 t3 t4 =
+    if snd t1 > snd t2 && snd t1 > snd t3 && snd t1 > snd t4 
+        then t1 
+        else if snd t2 > snd t3 && snd t2 > snd t4
+	    then t2
+	    else if snd t3 > snd t4
+	        then t3
+                else t4
+		
+
+
 
 
 
