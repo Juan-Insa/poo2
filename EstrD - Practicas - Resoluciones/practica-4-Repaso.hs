@@ -6,6 +6,7 @@ data Ingrediente = Salsa | Queso | Jamon | Aceitunas Int
 
 p1 = Capa Salsa (Capa Queso (Capa Jamon (Capa (Aceitunas 8) Prepizza)))
 p2 = Capa Salsa (Capa Queso (Capa (Aceitunas 8) (Capa Jamon (Capa (Aceitunas 8) Prepizza))))
+p3 = Capa Salsa (Capa Queso (Capa Queso (Capa Queso (Capa Salsa Prepizza))))
 
 -- a) Dada una pizza devuelve la cantidad de ingredientes
 cantidadDeCapas :: Pizza -> Int
@@ -31,34 +32,48 @@ esJamon Jamon = True
 esJamon _     = False
 
 -- d) Dice si una pizza tiene salsa y queso
--- tieneSoloSalsaYQueso :: Pizza -> Bool
--- tieneSoloSalsaYQueso Prepizza   = 
--- tieneSoloSalsaYQueso (Capa i p) = esSalsa 
--- 
--- tieneSoloQuesoYSalsa :: Pizza -> Bool 
--- tieneSoloQuesoYSalsa Prepizza   =
--- tieneSoloQuesoYSalsa (Capa i p) =
---     if esQueso p
---         then tieneSoloSalsa p
---         else False
+tieneSoloSalsaYQueso :: Pizza -> Bool
+tieneSoloSalsaYQueso p = tieneQueso p && tieneSalsa p && noTieneAceitunasYJamon p
+
+-- dada una pizza, indica si tiene salsa.
+tieneSalsa :: Pizza -> Bool
+tieneSalsa Prepizza   = False
+tieneSalsa (Capa i p) = esSalsa i || tieneSalsa p
+
+-- dada una pizza, indica si tiene queso.
+tieneQueso :: Pizza -> Bool
+tieneQueso Prepizza   = False
+tieneQueso (Capa i p) = esQueso i || tieneQueso p
+
+noTieneAceitunasYJamon :: Pizza -> Bool
+noTieneAceitunasYJamon Prepizza   = False
+noTieneAceitunasYJamon (Capa i p) = not (esAceitunas i) && not (esJamon i) && noTieneAceitunasYJamon p
+
+-- dado un ingrediente, indica si es aceitunas.
+esAceitunas :: Ingrediente -> Bool
+esAceitunas (Aceitunas n) = True
+esAceitunas _            = False
+
+-- dado un ingrediente, indica si es queso.
+esQueso :: Ingrediente -> Bool
+esQueso Queso = True
+esQueso _     = False
+
+-- dado un ingrediente, indica si es salsa.
+esSalsa :: Ingrediente -> Bool
+esSalsa Salsa = True
+esSalsa _     = False
 
 
 -- e) Recorre cada ingrediente y si es aceitunas duplica su cantidad
 duplicarAceitunas :: Pizza -> Pizza
 duplicarAceitunas Prepizza   = Prepizza
-duplicarAceitunas (Capa i p) = 
-	if esAceitunas i
-		then Capa (dobleAceitunas i) (duplicarAceitunas p)
-		else Capa i (duplicarAceitunas p)
-
--- dado un ingrediente, indica si es Aceitunas.
-esAceitunas :: Ingrediente -> Bool
-esAceitunas (Aceitunas n) = True
-esAceitunas _             = False
+duplicarAceitunas (Capa i p) = Capa (dobleAceitunas i) (duplicarAceitunas p)
 
 -- dadas Aceitunas, duplica su cantidad. precond: solo le puedo dar como ingrediente Aceitunas
 dobleAceitunas :: Ingrediente -> Ingrediente
 dobleAceitunas (Aceitunas n) = Aceitunas (n*2) 
+dobleAceitunas i             = i
 
 -- f) Dada una lista de pizzas devuelve un par donde la primera componente es la cantidad de
 --    ingredientes de la pizza, y la respectiva pizza como segunda componente
@@ -128,13 +143,18 @@ esTesoro _      = False
 -- 2) Indica si al final del camino hay un tesoro. Nota: el final de un camino se representa con una
 --    lista vacía de direcciones.
 hayTesoroEn :: [Dir] -> Mapa -> Bool
-hayTesoroEn []     (Fin c)               = hayTesoroEnC c
-hayTesoroEn []     (Bifurcacion c mi md) = hayTesoroEnC c     
+hayTesoroEn []     m                     = hayTesoroEnPrimerCofre m   
 hayTesoroEn (d:ds) (Fin c)               = False
 hayTesoroEn (d:ds) (Bifurcacion c mi md) = 
 	if esIzq d
 		then hayTesoroEn ds mi
 		else hayTesoroEn ds md
+
+-- indica si hay un tesoro en el primer cofre del mapa dado
+hayTesoroEnPrimerCofre :: Mapa -> Bool 
+hayTesoroEnPrimerCofre (Fin c)               = hayTesoroEnC c 
+hayTesoroEnPrimerCofre (Bifurcacion c mi md) = hayTesoroEnC c
+
 
 -- dada una Dir, indica si es Izquierda.
 esIzq :: Dir -> Bool
@@ -195,13 +215,13 @@ juntarPorNivel (xs:xss) (ys:yss) = (xs ++ ys) : juntarPorNivel xss yss
 
 -- 6) Devuelve todos lo caminos en el mapa
 todosLosCaminos :: Mapa -> [[Dir]]
-todosLosCaminos (Fin c)               = []
+todosLosCaminos (Fin c)               = [[]]
 todosLosCaminos (Bifurcacion c mi md) = 
-	agregarATodos Izq (todosLosCaminos mi) ++ agregarATodos Der (todosLosCaminos md)
+	[] : agregarATodos Izq (todosLosCaminos mi) ++ agregarATodos Der (todosLosCaminos md)
 
 -- Dados una dirección y una lista de listas de direcciones, agrega la dirección dada al comienzo de cada una.
 agregarATodos :: Dir -> [[Dir]] -> [[Dir]]
-agregarATodos d []       = [[d]]
+agregarATodos d []       = []
 agregarATodos d (ds:dss) = (d:ds) : agregarATodos d dss
 
 
@@ -225,7 +245,7 @@ n1 = N  (NodeT (S "control" [(Motor 6), (Motor 4)] ["fring","lalo"])
 	            (NodeT (S "ala medica" [Almacen [Oxigeno]] ["hannibal"]) 
 	            	EmptyT 
 	            	EmptyT) 
-		        (NodeT (S "laboratorio" [(Motor 3), Almacen [Combustible]] ["walter"]) 
+		        (NodeT (S "laboratorio" [(Motor 3), Almacen [Combustible]] ["walter","fring"]) 
 		        	EmptyT 
 		       	    (NodeT (S "comedor" [Almacen [Comida, Combustible]] ["bojack"]) 
 		       	    	(NodeT (S "motor2" [(Motor 6)] ["toreto"]) 
@@ -290,20 +310,12 @@ barrilesS (S _ cs _) = barrilesC cs
 
 barrilesC :: [Componente] -> [Barril]
 barrilesC []     = []
-barrilesC (c:cs) = 
-	if esAlmacen c
-	    then barril c ++ barrilesC cs
-        else barrilesC cs
-
--- Indica si el componente dado es un almacen.
-esAlmacen :: Componente -> Bool
-esAlmacen (Almacen bs) = True
-esAlmacen _            = False
+barrilesC (c:cs) = barril c ++ barrilesC cs
 
 -- dado un componente almacen, devuelve su barril. precond: el componente debe ser Almacen.
 barril :: Componente -> [Barril]
 barril (Almacen bs) = bs
-barril _            = error"me pasaste cualquier gilada"
+barril _            = []
 
 
 -- 4) Propósito: Añade una lista de componentes a un sector de la nave.
@@ -327,8 +339,8 @@ agregarASectorS cs1 (S i cs2 tr) = (S i (cs1 ++ cs2) tr)
 esSectorConId :: Sector -> SectorId -> Bool
 esSectorConId (S i _ _) sid = i == sid
 
--- Incorpora un tripulante a una lista de sectores de la nave.
--- Precondición: Todos los id de la lista existen en la nave.
+-- 5) Incorpora un tripulante a una lista de sectores de la nave.
+--    Precondición: Todos los id de la lista existen en la nave.
 asignarTripulanteA :: Tripulante -> [SectorId] -> Nave -> Nave
 asignarTripulanteA t ids (N tr) = N (asignarTripulanteAT t ids tr)
 
@@ -343,24 +355,24 @@ asignarTripulanteAS t []       s = s
 asignarTripulanteAS t (id:ids) s =
     if esSectorConId s id
         then asignarTripulante t s
-	else asignarTripulanteAS t ids s
+	    else asignarTripulanteAS t ids s
 
--- Propósito: Devuelve los sectores en donde aparece un tripulante dado.
+-- dados un tripulante y un sector, lo asigna al mismo.
+asignarTripulante :: Tripulante -> Sector -> Sector
+asignarTripulante t (S i cs ts) = S i cs (t:ts) 
+
+-- 6) Devuelve los sectores en donde aparece un tripulante dado.
 sectoresAsignados :: Tripulante -> Nave -> [SectorId]
 sectoresAsignados tr (N t) = sectoresAsignadosT tr t
 
 sectoresAsignadosT :: Tripulante -> Tree Sector -> [SectorId]
 sectoresAsignadosT t EmptyT          = []
-sectoresAsignadosT t (NodeT s si sd) = singularSi s (esAsignadoA t s) : sectoresAsignadosT t si ++ sectoresAsignadosT t sd
+sectoresAsignadosT t (NodeT s si sd) = 
+	singularSi (sectorId s) (esAsignadoA t s) ++ sectoresAsignadosT t si ++ sectoresAsignadosT t sd
 
 -- dado un tripulante y un sector, indica si el tripulante pertenece al sector.
 esAsignadoA :: Tripulante -> Sector -> Bool
-esAsignadoA t (S i cs ts) = estaElTripulante t ts
-
--- dado un tripulante y una lista de tripulante, indica si el tripulante pertenece la lista.
-estaElTripulante :: Tripulante -> [Tripulante] -> Bool
-estaElTripulante _  []     = False
-estaElTripulante t1 (t:ts) = t1 == t || estaElTripulante t1 ts
+esAsignadoA t (S i cs ts) = elem t ts
 
 singularSi :: a -> Bool -> [a]
 singularSi x True  = [x]
@@ -383,16 +395,41 @@ data Manada = M Lobo
 --    crías. Resolver las siguientes funciones utilizando recursión estructural sobre la estructura
 --    que corresponda en cada caso.
 
-m1 = Cazador "pichicho" [] 
-         (Explorador "firu" [] 
-	     (Cria "sfaf") 
-	     (Cria "asfas"))
-	 (Explorador "pancho" 
-	     (Cria "ksa")
-	     (Cria "kasn"))
-	 (Cria "qpq") 
+manada = M (Cazador "pichicho" ["1","2","3","4","5","6"] 
+               (Explorador "firu" [] 
+	               (Cria "sfaf") 
+	               (Cria "asfas"))
+	           (Explorador "pancho" []
+	               (Cria "ksa")
+	               (Cria "kasn"))
+	           (Cria "qpq"))
 
---  dada una manada, indica si la cantidad de alimento cazado es mayor a la cantidad de crías.
+manada2 = M (Cazador "pichicho" ["1","2"] 
+               (Cazador "firu" ["1","2","3","4","5"]  
+	               (Cria "sfaf") 
+	               (Cria "asfas")
+                   (Cazador "lola" ["1","2","3","4","5","6"] 
+                   	    (Cria "asfasg")
+                   	    (Cria "asgag")
+                   	    (Cria "agsbhsdh")))
+	           (Explorador "pancho" []
+	               (Cria "ksa")
+	               (Cria "kasn"))
+	           (Cria "qpq"))
+
+manada3 = M (Cazador "pichicho" ["1","2"] 
+               (Explorador "firu" ["desembarco del rey"]  
+	               (Cria "sfaf") 
+                   (Explorador "lola" ["desembarco del rey", "invernalia"] 
+                   	    (Cria "asgag")
+                   	    (Cria "agsbhsdh")))
+	           (Explorador "pancho" ["desembarco del rey"]
+	               (Cria "ksa")
+	               (Cria "kasn"))
+	           (Cria "qpq"))
+
+
+-- 2) dada una manada, indica si la cantidad de alimento cazado es mayor a la cantidad de crías.
 buenaCaza :: Manada -> Bool 
 buenaCaza (M l) = cantDePresas l > cantDeCrias l
 
@@ -401,11 +438,7 @@ cantDePresas :: Lobo -> Int
 cantDePresas (Cria       n)             = 0
 cantDePresas (Explorador n ts l1 l2)    = cantDePresas l1 + cantDePresas l2 
 cantDePresas (Cazador    n ps l1 l2 l3) = 
-    presas ps + cantDePresas l1 + cantDePresas l2 + cantDePresas l3
-
--- dada una lista de presas, devuelve su cantidad.
-presas :: [Presa] -> Int
-presas ps = length ps
+    length ps + cantDePresas l1 + cantDePresas l2 + cantDePresas l3
 
 cantDeCrias :: Lobo -> Int
 cantDeCrias (Cria       n)             = 1
@@ -415,32 +448,90 @@ cantDeCrias (Cazador    n ps l1 l2 l3) = cantDeCrias l1 + cantDeCrias l2 + cantD
 -- 3) dada una manada, devuelve el nombre del lobo con más presas cazadas, junto con su cantidad de
 --    presas. Nota: se considera que los exploradores y crías tienen cero presas cazadas, y que 
 --    podrían formar parte del resultado si es que no existen cazadores con más de cero presas
+
 elAlfa :: Manada -> (Nombre, Int)
 elAlfa (M l) = elAlfaL l
 
 elAlfaL :: Lobo -> (Nombre, Int)
 elAlfaL (Cria n)                   = (n,0)
-elAlfaL (Explorador n ts l1 l2)    = (n,0) (elAlfaL l1) (elAlfaL l2)
-elAlfaL (Cazador    n ps l1 l2 l3) = mayorCazador (n,presas ps) (elAlfaL l1) (elAlfaL l2) (elAlfaL l3)
+elAlfaL (Explorador n ts l1 l2)    = mayorCazador (mayorCazador (n,0) (elAlfaL l1)) (elAlfaL l2)
+elAlfaL (Cazador    n ps l1 l2 l3) = 
+	mayorCazador (mayorCazador (mayorCazador (n,length ps) (elAlfaL l1)) (elAlfaL l2)) (elAlfaL l3)
 
--- dadas cuatro tuplas con nombre de lobo y el número de presas asignadas, devuelve la de mayor cantidad
+-- dadas dos tuplas con nombre de lobo y el número de presas asignadas, devuelve la de mayor cantidad
 -- de presas cazadas.
-mayorCazador :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
-mayorCazador t1 t2 t3 t4 =
-    if snd t1 > snd t2 && snd t1 > snd t3 && snd t1 > snd t4 
-        then t1 
-        else if snd t2 > snd t3 && snd t2 > snd t4
-	    then t2
-	    else if snd t3 > snd t4
-	        then t3
-                else t4
-		
+mayorCazador :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
+mayorCazador c1 c2 = 
+	if snd c1 > snd c2
+		then c1
+		else c2
+
+
+-- 4) dado un territorio y una manada, devuelve los nombres de los exploradores que
+--    pasaron por dicho territorio.
+losQueExploraron :: Territorio -> Manada -> [Nombre]
+losQueExploraron t (M l) = losQueExploraronL t l
+
+losQueExploraronL :: Territorio -> Lobo -> [Nombre]
+losQueExploraronL t (Cria n)                = []
+losQueExploraronL t (Explorador n ts l1 l2) = singularSi n (elem t ts) ++ losQueExploraronL t l1 ++ losQueExploraronL t l2
+losQueExploraronL t (Cazador n ps l1 l2 l3) = 
+    losQueExploraronL t l1 ++ losQueExploraronL t l2 ++ losQueExploraronL t l3
+
+
+-- 5) dada una manada, denota la lista de los pares cuyo primer elemento es un territorio y cuyo segundo 
+--    elemento es la lista de los nombres de los exploradores que exploraron  dicho territorio. Los 
+--    territorios no deben repetirse.
+exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
+exploradoresPorTerritorio (M l) = exploradoresPorTerritorioL l
+
+-- agregarExploradorA n ts (exploradoresPorTerritorioL l1) ++ (exploradoresPorTerritorioL l2)
+
+exploradoresPorTerritorioL :: Lobo -> [(Territorio, [Nombre])]
+exploradoresPorTerritorioL (Cria n)                = []
+exploradoresPorTerritorioL (Explorador n ts l1 l2) = agregarExploradoresA (exploradorPorTerritorio n ts) (exploradoresPorTerritorioL l1 ++ exploradoresPorTerritorioL l2)
+exploradoresPorTerritorioL (Cazador n ps l1 l2 l3) = 
+	exploradoresPorTerritorioL l1 ++ exploradoresPorTerritorioL l2 ++ exploradoresPorTerritorioL l3
+
+-- dada una lista de pares territorio/nombre, y una lista de pares territorio/lista de nombres, agrega 
+-- los nombres del primer par a la lista de nombres del segundo al que le corresponde el mismo territorio.
+agregarExploradoresA :: [(Territorio, Nombre)] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+agregarExploradoresA []     ys = ys
+agregarExploradoresA (x:xs) ys = agregarExplorador x (agregarExploradoresA xs ys)
+
+-- dada un par territorio/nombre, y una lista de pares territorio/nombrelista de nombres, agrega el nombre del 
+-- primer par a la lista de nombres del segundo al que le corresponde el mismo territorio.
+agregarExplorador :: (Territorio, Nombre) -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+agregarExplorador p []     = (fst p, [(snd p)]) : []
+agregarExplorador p (x:xs) = agregarExploradorA p x : (agregarExplorador p xs)
+
+-- dados dos pares territorio/nombre agrega el nombre del primer par a la lista de nombres del segundo
+-- si tienen el mismo territorio como primer elemento.
+agregarExploradorA :: (Territorio, Nombre) -> (Territorio, [Nombre]) -> (Territorio, [Nombre])
+agregarExploradorA p1 p2 = 
+	if fst p1 == fst p2
+		then agregarNombre (snd p1) p2
+		else p2
+
+-- dados un nombre y un par territorio/lista de nombre, agrega el nombre a la lista de nombres del par.
+agregarNombre :: Nombre -> (Territorio, [Nombre]) -> (Territorio, [Nombre])
+agregarNombre n (t,ns) = (t, n : ns)
+
+-- dado un nombre y una lista de territorios, devuelve una lista de pares con los territorios asociados
+-- al nombre.
+exploradorPorTerritorio :: Nombre -> [Territorio] -> [(Territorio, Nombre)]
+exploradorPorTerritorio n []     = []
+exploradorPorTerritorio n (t:ts) = (t,n) : exploradorPorTerritorio n ts
+
+
+-- 6) dado un nombre de cazador y una manada, indica el nombre de todos los cazadores que tienen
+--    como subordinado al cazador dado (directa o indirectamente). 
+--    Precondición: hay un cazador con dicho nombre y es único.
+superioresDelCazador :: Nombre -> Manada -> [Nombre]
+superioresDelCazador = undefined
 
 
 
-
-
-        
 
 
 
