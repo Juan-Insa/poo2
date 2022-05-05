@@ -1,0 +1,27 @@
+-- Costo: O(m*t), siendo m la longitud de la primera lista y t la longitud de la segunda.
+agregarTerritorios :: [Territorio] -> Nombre -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])] 
+agregarTerritorios []     n tns = tns
+agregarTerritorios (t:ts) n tns = agregoT t n (agregarTerritorios ts n tns)
+
+-- Costo: O(t), siendo t la cant de elementos de la lista de tuplas.
+agregoT :: Territorio -> Nombre -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+agregoT t n []            = 
+agregoT t n ((t',ns):tns) = 
+    if esMismoT t t'
+        then (t', n:ns) : tns
+        else (t',ns) agregoT t n tns
+
+-- este es un de un set que admite repetidos
+-- Costo O(M), siendo M la cantidad de veces que se agregaron elementos al conjunto.
+-- esto se describe así porque la cant de elementos de la lista, no es la misma q la cant 
+-- de elementos del conjunto. si el conjunto tiene [1,1,1,1] la cant de elementos para el 
+-- mismo es 1, pero la cant de veces q se agregaron elementos es 4.
+-- Cuando se describen la cantidad de elementos se hace en base del usuario
+belongsS x (S xs) = pertenece x xs
+
+-- si la implementación fuera (S xs n) se podría usar un invariante.
+-- Inv.Rep.: n es la cant. de elementos de xs
+
+-- en map2 hacer keys sin claves repetidas.
+
+-- data structures and algorithms aho.

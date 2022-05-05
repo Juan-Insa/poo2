@@ -1,0 +1,77 @@
+module MultiSet1(MultiSet, addMS, ocurrencesMS, unionMS, intersectionMS, multiSetToList) where
+
+import Map1
+
+data Multiset a = MS (Map a Int)
+
+-- INV.Rep.: no tiene. 
+
+{- INTERFAZ MAP
+emptyM :: Map k v
+devuelve un map vacío
+
+assocM :: Eq k => k -> v -> Map k v -> Map k v
+agrega una asociación clave-valor al map.
+
+lookupM :: Eq k => k -> Map k v -> Maybe v
+encuentra un valor dado una clave.
+
+deleteM :: Eq k => k -> Map k v -> Map k v
+borra una asociación dada una clave.
+
+keys :: Map k v -> [k]
+devuelve las claves del map.
+-}
+
+-- Propósito: denota un multiconjunto vacío.
+-- Costo: O(1), porque el costo de emptyM es constante.
+emptyMS :: MultiSet emptyM
+
+-- Propósito: dados un elemento y un multiconjunto, agrega una ocurrencia de ese elemento al
+-- multiconjunto.
+-- Costo: O(n), siendo n y m la cantidad de elementos del map.
+addMS :: Ord a => a -> MultiSet a -> MultiSet a
+addMS x (MS m) = MS (agregarM x m)
+
+-- dada una clave y un map, asocia la clave con la cant de ocurrencias que corresponda.
+-- Costo: O(n^2), siendo n y m la cantidad de elementos del map.
+agregarM :: Ord a => a -> Map a Int -> Map a Int
+agregarM x m = assocM x ((ocurrencesMS x m) + 1) m
+
+-- Propósito: dados un elemento y un multiconjunto indica la cantidad de apariciones de ese
+-- elemento en el multiconjunto.
+-- Costo: O(n), siendo n la cantidad de elementos del map.
+ocurrencesMS :: Ord a => a -> MultiSet a -> Int
+ocurrencesMS x (MS m) = 
+    let v = lookupM x m
+    in if v == Nothing
+           then 0
+           else fromJust v
+
+-- dado un maybe devuelve su valor.
+-- precondición: no puede ser Nothing
+-- Costo: O(1), porque sólo devuelvo el valor x.
+fromJust :: Maybe a -> a  
+fromJust (Just x) = x 
+
+-- Propósito: dados dos multiconjuntos devuelve un multiconjunto con todos los elementos de
+-- ambos multiconjuntos.
+unionMS :: Ord a => MultiSet a -> MultiSet a -> MultiSet a (opcional)
+unionMS (MS m1) (MS m2) = MS (unionMSK (keys m1) m1 m2)
+
+unionMSK :: [k] -> Map a Int -> Map a Int -> Map a Int
+unionMSK []     m1 m2 = m2
+unionMSK (k:ks) m1 m2 = agregarParDeA k m1 (unionMSK ks m1 m2) 
+
+-- 
+agregarParDeA :: Ord a => a -> Map a Int -> Map a Int -> Map a Int
+agregarParDeA x m1 m2 = assocM x ((ocurrencesMS x m1) + (ocurrencesMS x m2)) m2
+
+-- Propósito: dados dos multiconjuntos devuelve el multiconjunto de elementos que ambos
+-- multiconjuntos tienen en común.
+intersectionMS :: Ord a => MultiSet a -> MultiSet a -> MultiSet a (opcional)
+
+Propósito: dado un multiconjunto devuelve una lista con todos los elementos del conjunto y
+su cantidad de ocurrencias.
+multiSetToList :: MultiSet a -> [(a, Int)]
+
