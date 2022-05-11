@@ -6,6 +6,8 @@ data Empresa = ConsE (Map SectorId (Set Empleado)) (Map CUIL Empleado)
 
 -- Inv. Rep.: 
 --    id de sectores y los legajos (CUIL) no pueden repetirse.
+--    los empleados de primer map debe estar en el segundo map.
+--    los empleados pertenecen a todos los sectores en los que estan asignados en el primer map.
 
 {- INTERFAZ EMPLEADO
 
