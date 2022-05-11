@@ -78,8 +78,8 @@ agregarEmpleadoSE (s:ss) e m =
 -- costo: O(log n), siendo n el tamaño del map.
 addEmpleadoASector :: SectorId -> Empleado -> Map SectorId Set -> Map SectorId Set
 addEmpleadoASector s e m =
-	let empleados = lookupM s m
-      in assocM s (addS e empleados) m
+        let empleados = lookupM s m
+          in assocM s (addS e empleados) m
 
 
 -- Propósito: agrega un sector al empleado con dicho CUIL.
@@ -91,11 +91,23 @@ agregarASector s c (ConsE m1 m2) =
 	      (assocM c empleado m1)
 
 -- Propósito: elimina al empleado que posee dicho CUIL.
--- Costo: calcular.
+-- Costo: O(t log n), siendo t la cant de sectores de la lista y n el tamaño del map.
 borrarEmpleado :: CUIL -> Empresa -> Empresa
 borrarEmpleado c (ConsE m1 m2) = 
-	ConsE (borrarEmpleadoSE c m1)
+        let empleado = lookupM c m2
+	ConsE (borrarEmpleadoSE (sectores c) empleado m1)
 	      (deleteM c m2) 
 
-borrarEmpleadoSE :: CUIL -> Map SectorId Set -> Map SectorId Set
-borrarEmpleadoSE c m = ..
+-- Costo: O(t log n), siendo t la cant de sectores de la lista y n el tamaño del map.
+-- precond: los sectores de la lista son validos para el map.
+borrarEmpleadoSE :: [SectorId] -> Empleado -> Map SectorId Set -> Map SectorId Set
+borrarEmpleadoSE []     e m = m
+borrarEmpleadoSE (s:ss) e m = 
+        let sinEmpleado = removeS e (lookupM s m)
+	  in assocM s sinEmpleado (borrarEmpleadoSE ss e m)
+	  
+	  
+
+
+
+
