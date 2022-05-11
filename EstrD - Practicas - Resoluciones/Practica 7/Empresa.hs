@@ -38,12 +38,12 @@ consEmpresa = ConsE emptyM emptyM
 -- Propósito: devuelve el empleado con dicho CUIL.
 -- Costo: O(log N)
 buscarPorCUIL :: CUIL -> Empresa -> Empleado
-buscarPorCUIL c (ConsE m1 m2) = lookupM c m2
+buscarPorCUIL c (ConsE m1 m2) = fromJust (lookupM c m2)
 
 -- Propósito: indica los empleados que trabajan en un sector dado.
 -- Costo: O(N)
 empleadosDelSector :: SectorId -> Empresa -> [Empleado]
-empleadosDelSector s (ConseE m1 m2) = setToList (lookupM s m1)
+empleadosDelSector s (ConseE m1 m2) = setToList (fromJust (lookupM s m1))
 
 -- Propósito: indica todos los CUIL de empleados de la empresa.
 -- Costo: O(N)
