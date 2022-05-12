@@ -1,0 +1,103 @@
+import Empresa
+
+-- Propósito: construye una empresa con la informacion de empleados dada.
+-- Costo: O().
+comenzarCon :: [SectorId] -> [CUIL] -> Empresa
+comenzarCon ss []     = consEmpresa
+comenzarCon ss (c:cs) = 
+    agregarEmpleado ss c (comenzarCon ss cs) 
+
+
+-- Propósito dada una empresa elimina la mitad de sus empleados (sin importar quienes).
+recortePersonal :: Empresa -> Empresa
+recortePersonal e = 
+    let cuiles = todosLosCUIL e    
+      in recorteDe ((length cuiles) / 2) cuiles e
+
+-- Costo: O().
+-- precond: el valor dado no es mayor a la longitud de la lista.
+recorteDe :: Int -> [CUIL] -> Empresa -> Empresa
+recorteDe 0 _      e = consEmpresa
+recorteDe n (c:cs) e = borrarEmpleado c (recorteDe (n-1) cs e)
+
+{-
+ANOTACIONES
+
+Implementación
+
+Costo: O(n), con n la cantidad de claves del map.
+Justif: losPrimeros es O(n).
+keys (M kvs) = losPrimeros kvs
+
+Costo: O(n), con n la cantidad de elementos de la lista.
+Justif: por cada elem, lo saca del par en O(1) y la agregar con (:) en O(1).
+losPrimeros [] =
+losPrimeros ((k,v):kvs) = k : losPrimeros kvs
+
+User
+
+la justificación es para
+
+ej si se usara map1: costo lookupM O(n), con n cant de pares del map.
+
+Costo: usando map1 O(n^2), n la cant de claves.
+Justif: sacarValores es O(k*n), y en este caso k = n, por keys.
+        el costo O(n) de keys es menor que O(n^2) y por lo tanto no influye.
+values m = sacarValores (keys m) m
+
+Costo: O(k*n), k la long de la lista, n la cant de claves.
+Justif: por cada elemento de la lista usa lookupM que es O(n).
+sacarValores []     m = []
+sacarValores (k:ks) m = lookupM : sacarValores ks m
+
+-} 
+
+-- Propósito: dado un CUIL de empleado, le asigna todos los sectore de la empresa.
+-- Costo: O(), donde n es la cantidad de sectores de la empresa.
+-- Justificar: todosLosSectores O(s) y asignarASectores O(s*log ).
+convertirEnComodinFEO :: CUIL -> Empresa -> Empresa
+convertirEnComodinFEO c e = asignarASectores (todosLosSectores e) c e
+
+-- Costo: O(t log n), donde t es la cantidad de sectores de la lista y n la de sectores de la empresa.
+asignarASectores :: [SectorId] -> CUIL -> Empresa -> Empresa
+asignarASectores []     c e = ConsEmpresa
+asignarASectores (s:ss) c e = agregarASector s c (asignarASectores xs c e)
+
+-- Costo: (s log s), siendo s la cantidad de sectores de la empresa.
+-- Justificacion: utiliza agregarEmpleado, borrarEmpleado y todosLosSectores
+-- con los costos             O(s log s)       O(s log s)        O(s)
+convertirEnComodin :: CUIL -> Empresa -> Empresa
+convertirEnComodin c e = agregarEmpleado (todosLosSectores e) c (borrarEmpleado c e)
+
+-- Propósito: dado un CUIL de empleado indica si el empleado está en todos los sectores.
+-- Costo: O(n), siendo n la cantidad de sectoresId en la empresa.
+-- Justif: porque los costos de length, todosLosSectores, sectores, buscarPorCUIL
+-- son los siguientes            O(l)       O(s)            O(i)       (log c)
+-- es posible porque la invariante de representación me asegura que un empleado conoce todos los sectores
+-- a los que está asignado en la estructura. 
+esComodin :: CUIL -> Empresa -> Bool
+esComodin c e = length (todosLosSectores e) == length (sectores (buscarPorCUIL c e))
+
+esComodin' :: CUIL -> Empresa -> Bool
+esComodin' c e = 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
