@@ -88,7 +88,8 @@ fromSet Nothing   = emptyS
 fromSet (Just es) = es
 
 -- Propósito: agrega un sector al empleado con dicho CUIL.
--- Costo: calcular.
+-- Costo: O(s*(log s + log e)) -> s siendo la cantidad de sectoresId donde esta el empleado + 1 y
+--                                e siendo la cantidad de empleado en la empresa.
 agregarASector :: SectorId -> CUIL -> Empresa -> Empresa
 agregarASector s c (ConsE m1 m2) = 
 	let empleado = agregarSector s (fromJust (lookupM c m2))
