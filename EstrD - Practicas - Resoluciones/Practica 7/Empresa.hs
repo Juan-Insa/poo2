@@ -57,7 +57,7 @@ todosLosSectores (ConsE m1 m2) = keys m1
 
 -- Propósito: agrega un empleado a la empresa, en el que trabajará en dichos sectores y tendrá
 -- el CUIL dado.
--- Costo: O(t log n), donde t es la cantidad de sectores de la lista y n el tamaño del primer map. 
+-- Costo: O(t log n), donde t es la cantidad de sectores de la lista y n la cantidad de sectoresId de la empresa. 
 agregarEmpleado :: [SectorId] -> CUIL -> Empresa -> Empresa
 agregarEmpleado ss c (ConsE m1 m2) = 
 	let empleado = agregarSectores ss (consEmpleado c)
