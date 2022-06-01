@@ -1,0 +1,49 @@
+1. // Precondición: c1 < c2
+   void printFromTo(char c1, char c2) {
+       for(int i = 0; c1 + i <= c2; i++) {
+            cout << c1 + i << ", ";
+       }
+       cout << endl;
+   }
+imprime en pantalla los valores numéricos de caracteres entre c1 y c2. Se utiliza una celda de memoria por cada caracter + 3, uno es por la celda NULL de corte y 2 por los parámetros c1 y c2.
+
+ejemplo:
+    int main() {
+        printFromTo('e','j'); 
+    }
+
+ej: printFromTo('e', 'j') -> 101, 102, 103, 104, 105, 106
+
+
+2. // Precondición: n >= 0
+   int fc(int n) {
+       int x = 1;
+       while(n > 0) {
+           x = x * n;
+           n--;
+       }
+       return x;
+   }
+
+devuelve el factorial del numero dado con iteración. Utiliza al menos una celda de memoria para el parámtero, otra para la variable x.
+
+ejemplo: fc(4) -> 24
+         fc(5) -> 120
+         fc(6) -> 720
+
+
+3. // Precondición: n <= m
+   int ft(int n, int m) {
+       if (n == m) {
+       return n;
+       }
+       return n + ft(n+1, m);
+   }
+
+devuelve la suma de los números entre n y m usando recursión. Utiliza al menos m-n cantidad de frames, cada uno con celdas para los parámetros n y m.
+
+ejemplo: ft(2,5)  -> 14 = (2+3+4+5)
+         ft(6,10) -> 40 = (6+7+8+9+10)
+         ft(5,9)  -> 35 = (5+6+7+8+9)
+
+
