@@ -1,0 +1,75 @@
+// Ejercicio 5
+
+struct Fraccion{
+    int numerador;
+    int denominador;
+};
+
+Fraccion consFraccion(int numerador, int denominador){
+    Fraccion f;
+    f.numerador = numerador;
+    f.denominador = denominador;
+    return f;
+}
+
+int numerador(Fraccion f){
+    return f.numerador;
+}
+
+int denominador(Fraccion f){
+    return f.denominador;
+}
+
+float division(Fraccion f){
+    return f.numerador / f.denominador;
+}
+
+Fraccion multF(Fraccion f1, Fraccion f2){
+    Fraccion f3 = consFraccion(f1.numerador + f2.numerador, f1.denominador + f2.denominador);
+    return division(f3);
+}
+
+Fraccion multF2(Fraccion f1, Fraccion f2){
+    return (f1.numerador + f2.numerador) / (f1.denominador + f2.denominador);
+}
+
+Fraccion simplificada(Fraccion p){
+    int divisor = mcm(p.numerador, p.denominador);
+    return consFraccion(p.numerador / mcd, p.denominador / mcd);
+}
+
+int mcm(int n, int m){
+    int i = elMenorEntre(n, m);
+    while(!esDivisorDe(i,n) && !esDivisorDe(i,m)){
+        i--;
+    }
+    return i;
+}
+
+int elMenorEntre(int n, int m){
+    if (n<m){
+        return n;
+    } else {
+        return m;
+    }
+}
+
+
+Fraccion sumF(Fraccion f1, Fraccion f2){
+    int numerador = (f1.numerador * f2.denominador) + (f2.numerador * f1.denominador);
+    int denominador = f1.denominador * f2.denominador;
+    return consFraccion(numerador, denominador);
+    
+
+}
+
+
+
+
+
+
+
+
+
+
+
