@@ -1,0 +1,61 @@
+
+Observaciones para el Tp
+
+TP--> State para muestra
+
+clase abstracta de estado -> EstadoMuestra
+
+clases concretas -> Verificada
+clases concretas -> ConOpinionExperto
+clases concretas -> SinOpinionExperto
+
+agregarOpinion de ConOpinionExperto puede tener al final chequearResultado.
+
+para SinOpinionExperto no hace falta porque no se puede dar resultado.
+
+getResultadoActual() de ConOpinionExperto puede devolver o la primera que encuentra o NINGUNA, porque hasta q no haya dos opiniones expertas no se podría dar un resultado actual, sólo si hay UNA SOLA opinion de experto.
+
+el algoritmo de agregar opinion: es mejor definirlo en Muestra o en el EstadoMuestra ?
+
+Por ahora lo hago en EstadoMuestra, pero tengo q hacer dos métodos para agregar opinion, uno agregarOpinionRequest que cuando inicialmente se quiere agregar una opinion delega todo lo q tiene q ver con eso al estado. Y la otra es simplemente para que agrege la opinion a la lista.
+
+agregarOpinion en EstadoMuestra quedaría como un template method.
+
+donde hago el cambio de estado cuando ingresa la primer opinion experta? si lo hago en la muestra me lo va a cambiar aunque ya esté verificada.
+
+Listo, cambios de estado:
+
+1- se inicializa la muestra como SinOpinionExperta.
+
+2- el cambio de estado a ConOpinionExperta va en el agregarOpinion() de SinOpinionExperta. Después de agregar la opinion a la muestra, cambia el estado si es de un experto, si no lo es, no hace nada.
+
+3- el cambio de estado a Verificada se hace en chequear
+
+agregarOpinionRequest al final lo dejo como agregarOpinion así queda polimórfico con los estados; y para agregar la opinion a la lista addOpinion.
+
+como es el tema de la opinión de quien sube la muestra, se agrega desde el constructor o es con un mensaje aparte como las demás opiniones (o sea, sin implementarlo).
+la clasificación NINGUNA, se puede usar para definir el resultado de la muestra cuando se inicializa?
+
+qué devuelvo en getResultadoActual() si hay opiniones de expertos pero todavía no esta verificada la muestra? por ahora devuelvo el valor de clasificación de la última opinion agregada.
+
+----------------------------------------------------
+
+patrón observer para Organizacion, roles:
+
+Subject          -> ZonaDeCoberturaObserver
+
+ConcreteSubject  -> ZonaDeCovertura
+
+Observer         -> OrganizacionListener
+
+ConcreteObserver -> Organizacion
+
+dudas:
+OrganizaciónObserver es mejor si es una clase abstracta o una interfaz?
+mismo para ZonaDeCoberturaSubject
+
+
+
+
+
+
