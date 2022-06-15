@@ -108,7 +108,7 @@ void Append(LinkedList xs, LinkedList ys) {
         Next(ixs);
     }
     DisposeIterator(ixs);
-    DestroyL(ys);
+    delete ys;
 }
 
 
