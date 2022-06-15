@@ -21,6 +21,7 @@ void Next(ListIterator ixs);
 bool atEnd(ListIterator ixs);
 void DisposeIterator(ListIterator ixs);
 void DestroyL(LinkedList xs);
+void append(LinkedList xs, LinkedList ys);
 
 
 
