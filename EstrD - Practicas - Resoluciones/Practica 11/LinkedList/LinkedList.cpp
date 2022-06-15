@@ -76,9 +76,12 @@ void Snoc(int x, LinkedList xs) {
     nodo->siguiente = NULL;
 
     NodoL* actual = xs->primero;
-    while(actual->siguiente != NULL){ 
-        actual = actual->siguiente;    
+    if (actual != NULL){
+        while(actual->siguiente != NULL){ 
+            actual = actual->siguiente;    
+        }
     }
+    else {xs->primero = actual;}
     actual->siguiente = nodo; 
     xs->cantidad++;
 }
