@@ -102,7 +102,13 @@ LinkedList copy(LinkedList xs) {
 // Costo: O(Y*X): siendo Y la cantidad de elementos de ys y X la cant de elementos de X.
 // Justif.: por cada elemento de ys se recorre xs con la operación Snoc de O(X).
 void Append(LinkedList xs, LinkedList ys) {
-    
+    ListIterator ixs = getIterator(ys);
+    while (!atEnd(ixs)) {
+        Snoc(current(ixs), xs);
+        Next(ixs);
+    }
+    DisposeIterator(ixs);
+    DestroyL(ys);
 }
 
 
